@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reliance Lens — AI Assurance Workbench</title>
+
+<style>
+:root{
+  --ink:#18202a;
+  --muted:#65707c;
+  --blue:#174a73;
+  --line:#d9dee4;
+  --soft:#f5f7f9;
+  --green:#176b3a;
+  --red:#8b2020;
+  --amber:#765900;
+  --white:#fff;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  color:var(--ink);
+  background:#fafbfc;
+  font:15px/1.55 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+header{
+  background:#111827;
+  color:white;
+  padding:34px 24px 30px;
+}
+
+header .inner{
+  max-width:1120px;
+  margin:auto;
+}
+
+h1{
+  margin:0 0 7px;
+  font-size:32px;
+  line-height:1.1;
+}
+
+header p{
+  margin:0;
+  color:#cbd5e1;
+  max-width:800px;
+}
+
+main{
+  max-width:1120px;
+  margin:28px auto 70px;
+  padding:0 20px;
+}
+
+.sequence{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin:0 0 22px;
+}
+
+.sequence span{
+  padding:7px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:white;
+  font-size:12px;
+  font-weight:700;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+}
+
+.card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:20px;
+}
+
+.card.full{
+  grid-column:1/-1;
+}
+
+h2{
+  margin:0 0 13px;
+  font-size:18px;
+  color:var(--blue);
+}
+
+h3{
+  margin:20px 0 8px;
+  font-size:15px;
+}
+
+label{
+  display:block;
+  margin:10px 0 5px;
+  font-weight:700;
+  font-size:13px;
+}
+
+input,select,textarea{
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:7px;
+  padding:9px 10px;
+  font:inherit;
+  background:white;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+.controls{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+
+.controls th,
+.controls td{
+  border-bottom:1px solid var(--line);
+  padding:9px 7px;
+  text-align:left;
+  vertical-align:top;
+}
+
+.controls th{
+  background:var(--soft);
+  font-size:12px;
+}
+
+.controls input{
+  min-width:120px;
+}
+
+button{
+  border:0;
+  border-radius:7px;
+  padding:10px 15px;
+  margin:5px 7px 0 0;
+  font-weight:700;
+  cursor:pointer;
+  background:#111827;
+  color:white;
+}
+
+button.secondary{
+  background:#e8edf2;
+  color:#1f2937;
+}
+
+button:hover{
+  opacity:.88;
+}
+
+.callout{
+  padding:15px;
+  border:1px solid var(--line);
+  border-left:4px solid var(--blue);
+  background:var(--soft);
+  margin:13px 0;
+}
+
+.callout.warn{
+  border-left-color:#b7791f;
+  background:#fffaf0;
+}
+
+.status{
+  display:none;
+  margin-top:18px;
+}
+
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.metric{
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:white;
+}
+
+.metric .value{
+  font-size:25px;
+  font-weight:800;
+  margin-top:3px;
+}
+
+.metric .label{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:600;
+}
+
+.green{color:var(--green)}
+.red{color:var(--red)}
+.amber{color:var(--amber)}
+
+.finding{
+  margin-top:15px;
+  padding:17px;
+  border-radius:10px;
+  background:#f3f6fa;
+  border:1px solid var(--line);
+}
+
+table.summary{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+}
+
+table.summary th,
+table.summary td{
+  border:1px solid var(--line);
+  padding:9px;
+  text-align:left;
+  vertical-align:top;
+}
+
+table.summary th{
+  background:var(--soft);
+}
+
+.tag{
+  display:inline-block;
+  padding:3px 7px;
+  border-radius:999px;
+  background:#edf2f7;
+  font-size:11px;
+  font-weight:700;
+  margin:2px 3px 2px 0;
+}
+
+.small{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.mono{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:12px;
+}
+
+@media(max-width:780px){
+  .grid{grid-template-columns:1fr}
+  .card.full{grid-column:auto}
+  .metrics{grid-template-columns:1fr}
+  .controls{font-size:12px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="inner">
+    <h1>Reliance Lens — AI Assurance Workbench</h1>
+    <p>
+      A structured way to test whether apparent safeguards and evidence sources
+      provide genuine independent assurance, or remain coupled through shared
+      underlying conditions.
+    </p>
+  </div>
+</header>
+
+<main>
+
+  <div class="sequence">
+    <span>Claim</span>
+    <span>Function</span>
+    <span>Reliance</span>
+    <span>Coupling</span>
+    <span>Independence</span>
+    <span>Test</span>
+    <span>Evidence</span>
+    <span>Finding</span>
+  </div>
+
+  <div class="callout">
+    <strong>Core question:</strong>
+    When several safeguards or evaluation methods appear different,
+    what evidence establishes that they would not fail together?
+  </div>
+
+  <div class="callout warn">
+    <strong>Scope:</strong>
+    This is a research/evaluation prototype. It does not certify a model,
+    organization, product, security posture, or compliance status.
+  </div>
+
+  <div class="grid">
+
+    <!-- 1 -->
+    <section class="card">
+      <h2>1. Claim</h2>
+
+      <label>System / deployment</label>
+      <input id="system"
+        value="AI-assisted decision system">
+
+      <label>Assurance claim</label>
+      <textarea id="claim">Multiple safeguards provide independent protection against harmful or unreliable outputs.</textarea>
+
+      <label>Critical property</label>
+      <input id="property"
+        value="Reliable and safe operation">
+    </section>
+
+    <!-- 2 -->
+    <section class="card">
+      <h2>2. Function</h2>
+
+      <label>What must actually be accomplished?</label>
+      <textarea id="function">Detect problematic model behavior before it causes consequential downstream action.</textarea>
+
+      <label>Failure consequence</label>
+      <textarea id="consequence">A novel failure remains undetected because the monitoring and review mechanisms do not recognize it.</textarea>
+    </section>
+
+    <!-- 3 -->
+    <section class="card full">
+      <h2>3. Reliance map</h2>
+
+      <p class="small">
+        Describe controls by the function they perform and the conditions they
+        rely upon. The interesting question is not whether the controls are
+        technically different, but whether their failure pathways are distinct.
+      </p>
+
+      <table class="controls">
+        <thead>
+          <tr>
+            <th>Control / evidence source</th>
+            <th>Function</th>
+            <th>Primary reliance</th>
+            <th>Shared dependency</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td><input id="c1"
+              value="Model refusal behavior"></td>
+            <td><input id="f1"
+              value="Prevent harmful response"></td>
+            <td><input id="r1"
+              value="Model representation"></td>
+            <td><input id="d1"
+              value="Model behavior"></td>
+          </tr>
+
+          <tr>
+            <td><input id="c2"
+              value="Automated monitoring"></td>
+            <td><input id="f2"
+              value="Detect anomalous behavior"></td>
+            <td><input id="r2"
+              value="Detection taxonomy"></td>
+            <td><input id="d2"
+              value="Model behavior"></td>
+          </tr>
+
+          <tr>
+            <td><input id="c3"
+              value="Human review"></td>
+            <td><input id="f3"
+              value="Escalate ambiguous cases"></td>
+            <td><input id="r3"
+              value="Alert reaching reviewer"></td>
+            <td><input id="d3"
+              value="Detection taxonomy"></td>
+          </tr>
+
+          <tr>
+            <td><input id="c4"
+              value="Benchmark evaluation"></td>
+            <td><input id="f4"
+              value="Estimate reliability"></td>
+            <td><input id="r4"
+              value="Evaluation task distribution"></td>
+            <td><input id="d4"
+              value="Known failure categories"></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 4 -->
+    <section class="card">
+      <h2>4. Coupling / failure scenario</h2>
+
+      <label>Scenario</label>
+      <textarea id="scenario">A novel failure mode is absent from the detection taxonomy used by both automated monitoring and human escalation.</textarea>
+
+      <label>Potential propagation</label>
+      <textarea id="propagation">No alert → no human review → apparently normal monitoring record → confidence remains inflated.</textarea>
+    </section>
+
+    <!-- 5 -->
+    <section class="card">
+      <h2>5. Evidence</h2>
+
+      <label>Evidence currently available</label>
+      <textarea id="evidence">Model-card claims, benchmark results, monitoring documentation, red-team report and sample outputs.</textarea>
+
+      <label>Evidence quality</label>
+      <select id="evidenceQuality">
+        <option value="1">Descriptive only</option>
+        <option value="2" selected>Mixed / partially empirical</option>
+        <option value="3">Repeated empirical evidence</option>
+        <option value="4">Independent empirical evidence</option>
+      </select>
+
+      <label>Known uncertainty</label>
+      <textarea id="uncertainty">The controls may share assumptions about what constitutes an observable failure.</textarea>
+    </section>
+
+    <!-- 6 -->
+    <section class="card full">
+      <h2>6. Discriminating tests</h2>
+
+      <p class="small">
+        Good assurance tests should separate competing explanations rather than
+        simply accumulate more evidence for the existing story.
+      </p>
+
+      <table class="summary">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Question</th>
+            <th>What would change confidence?</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Common-mode failure test</td>
+            <td>
+              What happens when the shared dependency is deliberately perturbed?
+            </td>
+            <td>
+              Independent controls continue detecting the failure.
+            </td>
+          </tr>
+
+          <tr>
+            <td>Blind-spot test</td>
+            <td>
+              Can a novel failure escape every existing detection pathway?
+            </td>
+            <td>
+              A control detects the failure without relying on the existing taxonomy.
+            </td>
+          </tr>
+
+          <tr>
+            <td>Assumption inversion</td>
+            <td>
+              What if a central assumption used by several evaluations is false?
+            </td>
+            <td>
+              At least one evaluation remains informative.
+            </td>
+          </tr>
+
+          <tr>
+            <td>Evidence-independence test</td>
+            <td>
+              Are several reassuring findings actually derived from the same data,
+              model behavior, evaluator, or deployment assumption?
+            </td>
+            <td>
+              Evidence sources remain informative when the common source degrades.
+            </td>
+          </tr>
+
+          <tr>
+            <td>Adversarial authority test</td>
+            <td>
+              Does false authority, urgency, or instruction hierarchy change
+              protected behavior?
+            </td>
+            <td>
+              System boundaries remain stable under matched pressure.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Buttons -->
+    <section class="card full">
+      <button onclick="runAssessment()">Run Reliance Lens Assessment</button>
+      <button class="secondary" onclick="loadExample()">Load Worked Example</button>
+      <button class="secondary" onclick="resetAll()">Reset</button>
+      <button class="secondary" onclick="copySummary()">Copy Findings</button>
+    </section>
+
+    <!-- Output -->
+    <section id="output" class="card full status">
+      <h2>7. Assurance assessment</h2>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="label">Shared-dependency exposure</div>
+          <div id="dependenceScore" class="value">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="label">Evidence strength</div>
+          <div id="evidenceScore" class="value">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="label">Assurance position</div>
+          <div id="assuranceStatus" class="value">—</div>
+        </div>
+      </div>
+
+      <div id="finding" class="finding"></div>
+
+      <h3>Dependency structure</h3>
+      <div id="dependencyTable"></div>
+
+      <h3>Priority tests</h3>
+      <div id="tests"></div>
+
+      <h3>Interpretation</h3>
+      <div id="interpretation"></div>
+
+      <p class="small">
+        Heuristic output for demonstration. A real evaluation would replace
+        heuristic scoring with a prespecified protocol, recorded observations,
+        replication, adjudication and uncertainty analysis.
+      </p>
+    </section>
+
+  </div>
+</main>
+
+<script>
+
+const $ = id => document.getElementById(id);
+
+function val(id){
+  return $(id).value.trim();
+}
+
+function escapeHtml(s){
+  return String(s || "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[c]));
+}
+
+function collectControls(){
+
+  return [1,2,3,4].map(i => ({
+    name:val("c"+i),
+    func:val("f"+i),
+    reliance:val("r"+i),
+    dependency:val("d"+i)
+  }));
+
+}
+
+function runAssessment(){
+
+  const controls = collectControls();
+
+  const deps = {};
+  controls.forEach(c=>{
+    if(!deps[c.dependency]) deps[c.dependency]=[];
+    deps[c.dependency].push(c.name);
+  });
+
+  const shared = Object.entries(deps)
+    .filter(([dep,items])=>items.length>1);
+
+  const maxShared = controls.length - 1;
+  const sharedCount = shared.reduce(
+    (n,[,items])=>n + (items.length-1),0
+  );
+
+  const dependence =
+    maxShared === 0 ? 0 :
+    Math.round(100 * sharedCount / maxShared);
+
+  const eq = Number($("evidenceQuality").value);
+
+  let evidenceLabel =
+    eq===1 ? "Descriptive" :
+    eq===2 ? "Mixed" :
+    eq===3 ? "Empirical" :
+    "Independently supported";
+
+  let status;
+  let statusClass;
+
+  if(dependence >= 67 && eq <= 2){
+    status = "Weak";
+    statusClass = "red";
+  }
+  else if(dependence >= 34 || eq <= 2){
+    status = "Conditional";
+    statusClass = "amber";
+  }
+  else{
+    status = "Stronger";
+    statusClass = "green";
+  }
+
+  $("output").style.display="block";
+
+  $("dependenceScore").textContent =
+    dependence + "%";
+
+  $("dependenceScore").className =
+    "value " + (dependence>=50 ? "red":"amber");
+
+  $("evidenceScore").textContent =
+    evidenceLabel;
+
+  $("evidenceScore").className =
+    "value " + (eq>=3 ? "green":"amber");
+
+  $("assuranceStatus").textContent =
+    status;
+
+  $("assuranceStatus").className =
+    "value " + statusClass;
+
+  let finding = "";
+
+  if(shared.length){
+    finding += `
+      <strong>Finding:</strong>
+      Several controls that appear distinct share underlying dependencies.
+      That does not prove common-mode failure, but it means the claim of
+      independent protection has not been established.
+    `;
+  }else{
+    finding += `
+      <strong>Finding:</strong>
+      No shared dependencies were entered across the current control map.
+      That is evidence worth testing, not proof of independence.
+    `;
+  }
+
+  finding += `
+    <p>
+      <strong>Critical function:</strong>
+      ${escapeHtml(val("function"))}
+    </p>
+
+    <p>
+      <strong>Failure scenario:</strong>
+      ${escapeHtml(val("scenario"))}
+    </p>
+  `;
+
+  $("finding").innerHTML = finding;
+
+  let depHtml = `
+    <table class="summary">
+      <thead>
+        <tr>
+          <th>Shared dependency</th>
+          <th>Controls relying on it</th>
+          <th>Potential implication</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  if(shared.length){
+
+    shared.forEach(([dep,items])=>{
+      depHtml += `
+        <tr>
+          <td><strong>${escapeHtml(dep)}</strong></td>
+          <td>${items.map(x =>
+            `<span class="tag">${escapeHtml(x)}</span>`
+          ).join("")}</td>
+          <td>
+            A failure of the shared dependency could affect multiple
+            apparent safeguards simultaneously.
+          </td>
+        </tr>
+      `;
+    });
+
+  }else{
+
+    depHtml += `
+      <tr>
+        <td colspan="3">
+          No shared dependencies identified in the entered map.
+        </td>
+      </tr>
+    `;
+
+  }
+
+  depHtml += "</tbody></table>";
+
+  $("dependencyTable").innerHTML = depHtml;
+
+  const tests = [];
+
+  if(shared.length)
+    tests.push(
+      "Deliberately perturb each shared dependency and determine which controls continue to detect the target failure."
+    );
+
+  tests.push(
+    "Introduce a failure mode outside the existing detection taxonomy and test whether any independent pathway detects it."
+  );
+
+  tests.push(
+    "Trace every reassuring evidence source back to its data, model behavior, evaluator, assumptions and deployment conditions."
+  );
+
+  tests.push(
+    "Repeat the evaluation across materially different model versions, settings or operating conditions to test whether the finding survives environmental change."
+  );
+
+  $("tests").innerHTML =
+    "<ol>" +
+    tests.map(x=>`<li>${escapeHtml(x)}</li>`).join("") +
+    "</ol>";
+
+  $("interpretation").innerHTML = `
+    <p>
+      <strong>Interpretation:</strong>
+      The central assurance question is not whether more controls exist,
+      but whether the controls create genuinely distinct opportunities
+      to detect and interrupt failure.
+    </p>
+
+    <p>
+      <strong>Current evidence:</strong>
+      ${escapeHtml(val("evidence"))}
+    </p>
+
+    <p>
+      <strong>Known uncertainty:</strong>
+      ${escapeHtml(val("uncertainty"))}
+    </p>
+
+    <p>
+      <strong>Next decision:</strong>
+      ${dependence >= 50
+        ? "Test common-mode dependence before treating the safeguards as independent evidence of safety."
+        : "Collect discriminating evidence showing that the apparent separation survives plausible shared failures."
+      }
+    </p>
+  `;
+
+}
+
+function loadExample(){
+
+  $("system").value =
+    "AI-assisted clinical triage system";
+
+  $("claim").value =
+    "Multiple safeguards independently prevent unsafe recommendations.";
+
+  $("property").value =
+    "Reliable identification and escalation of unsafe recommendations.";
+
+  $("function").value =
+    "Detect potentially unsafe recommendations before they influence clinical action.";
+
+  $("consequence").value =
+    "A novel clinical failure remains undetected because monitoring, review and evaluation share the same assumptions about what constitutes an unsafe output.";
+
+  $("c1").value="Model refusal behavior";
+  $("f1").value="Prevent unsafe output";
+  $("r1").value="Model representation";
+  $("d1").value="Model behavior";
+
+  $("c2").value="Automated monitoring";
+  $("f2").value="Detect unsafe behavior";
+  $("r2").value="Detection taxonomy";
+  $("d2").value="Model behavior";
+
+  $("c3").value="Human review";
+  $("f3").value="Review flagged cases";
+  $("r3").value="Alert generation";
+  $("d3").value="Detection taxonomy";
+
+  $("c4").value="Benchmark evaluation";
+  $("f4").value="Estimate reliability";
+  $("r4").value="Known test distribution";
+  $("d4").value="Known failure categories";
+
+  $("scenario").value =
+    "A novel failure mode is not represented in the monitoring taxonomy used by both automated monitoring and human escalation.";
+
+  $("propagation").value =
+    "No alert → no human review → benchmark remains reassuring → aggregate evidence understates the common failure.";
+
+  $("evidence").value =
+    "Model-card claims, benchmark results, monitoring documentation, red-team results and manually reviewed sample outputs.";
+
+  $("evidenceQuality").value="2";
+
+  $("uncertainty").value =
+    "The safeguards may be operationally different while still depending on the same representation of failure.";
+
+  runAssessment();
+}
+
+function resetAll(){
+
+  document.querySelectorAll("input").forEach(el=>{
+    if(el.type!=="file") el.value="";
+  });
+
+  document.querySelectorAll("textarea").forEach(
+    el=>el.value=""
+  );
+
+  $("output").style.display="none";
+}
+
+function copySummary(){
+
+  const text =
+`Reliance Lens — AI Assurance Assessment
+
+System:
+${val("system")}
+
+Claim:
+${val("claim")}
+
+Shared-dependency exposure:
+${$("dependenceScore").textContent}
+
+Evidence strength:
+${$("evidenceScore").textContent}
+
+Assurance position:
+${$("assuranceStatus").textContent}
+
+Scenario:
+${val("scenario")}
+
+Known uncertainty:
+${val("uncertainty")}
+
+Interpretation:
+The key question is whether apparently independent safeguards remain
+operationally distinct when plausible shared dependencies fail.`;
+
+  navigator.clipboard.writeText(text)
+    .then(()=>{
+      alert("Assessment summary copied.");
+    })
+    .catch(()=>{
+      alert("Copy failed. Select and copy the assessment manually.");
+    });
+}
+
+</script>
+
+</body>
+</html>
