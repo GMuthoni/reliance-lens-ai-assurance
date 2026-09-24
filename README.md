@@ -2,7 +2,7 @@
 
 **Research prototype · 2026**
 
-**Live demo:** https://<username>.github.io/reliance-lens-ai-assurance/
+**Live demo:** https://gmuthoni.github.io/reliance-lens-ai-assurance/ 
 
 Reliance Lens is a framework for examining whether apparently independent safeguards, evaluations, or interventions provide genuinely independent assurance—or remain coupled through shared assumptions, representations, infrastructure, people, signals, or decision pathways.
 
